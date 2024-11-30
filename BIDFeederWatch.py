@@ -19,6 +19,19 @@ import cv2
 import time
 import datetime
 
+CAMERA_INDEX = 0  # use 1, if using external webcam on laptop with built-in camera
+MAX_RECORDINGS = 3
+RECORDING_TIME = 5  # in seconds 
+GREATER_THAN_RECORDING_TIME = 10  # in seconds, this number should always be larger than RECORDING_TIME
+MOTION_RESET_TIME = 5  # in seconds
+MIN_CONTOUR_SIZE = 500
+FPS = 20.0
+FRAME_WIDTH = 640
+FRAME_HEIGHT = 480
+
+# Global Variables
+firstFrame = None
+firstFrameTime = 0.0
 
 def main():
     """Starts the application. Gets the camera resource
@@ -29,7 +42,7 @@ def main():
     
     # Open camera. On laptop, this value is 1.
     # Due to the fact that the laptop has a built in camera.
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(CAMERA_INDEX)
     
     # Turns camera on and is prepared to record when movement is detected.
     cameraStandby(cap)
@@ -48,7 +61,7 @@ def cameraStandby(cap: cv2.VideoCapture):
     """
     # Local Variables
     # Set start time before the current time, so it doesn't start recording.
-    startRecordingTime = time.time() - 10
+    startRecordingTime = time.time() - GREATER_THAN_RECORDING_TIME
     recording = False
     out = cv2.VideoWriter()
     recordingsMade = 0
@@ -66,12 +79,12 @@ def cameraStandby(cap: cv2.VideoCapture):
                 # Define the codec and create a VideoWriter object to save the video named as date and time.
                 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
                 name = videoName() + '.mp4'
-                out = cv2.VideoWriter(name, fourcc, 20.0, (640, 480))
+                out = cv2.VideoWriter(name, fourcc, FPS, (FRAME_WIDTH, FRAME_HEIGHT))
                 startRecordingTime = time.time()
                 recording = True                
                 # Write the first frame of recording.
                 out.write(frame)
-            elif time.time() - startRecordingTime < 5 and recording:
+            elif time.time() - startRecordingTime < RECORDING_TIME and recording:
                 # out should already exist from earlier loop. 
                 # While start time is with within 5 seconds of current time, keep recording. 
                 out.write(frame)
@@ -86,7 +99,7 @@ def cameraStandby(cap: cv2.VideoCapture):
             if (cv2.waitKey(1) & 0xFF == ord('q')):
                 break
             
-            if recordingsMade >= 3:
+            if recordingsMade >= MAX_RECORDINGS:
                 break
         else:
             break
@@ -107,10 +120,12 @@ def isMotionDetected(frame):
         frame: Either returns the current frame, or a modified frame with green boxes.
         motionDetected (bool): Returns a boolean value to indicate if motion was detected.
     """
-    # Local variables
-    firstFrame
-    firstFrameTime
-    motionDetected
+    # Global Variables
+    global firstFrame  # global because it must be stored beyond the scope of the method
+    global firstFrameTime  # global because it must be stored beyond the scope of the method
+    
+    # Local Variable
+    motionDetected = False 
     
     # Convert the frame to grayscale
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -126,7 +141,7 @@ def isMotionDetected(frame):
         return frame, motionDetected
     
     # Reset the first frame after 5 seconds so not comparing to original. 
-    if time.time() - firstFrameTime > 5:
+    if time.time() - firstFrameTime > MOTION_RESET_TIME:
         firstFrame = gray
         firstFrameTime = time.time()
         motionDetected = False
@@ -150,7 +165,7 @@ def isMotionDetected(frame):
     # Loop over the contours
     for contour in contours:
         # If the contour is too small, ignore it (this filters out small changes)
-        if cv2.contourArea(contour) < 500:
+        if cv2.contourArea(contour) < MIN_CONTOUR_SIZE:
             continue
 
         # Get the bounding box for the contour and draw it on the frame
