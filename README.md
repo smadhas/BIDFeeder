@@ -8,6 +8,9 @@ This project will watch a bird feeder and record video when motion is detected. 
   - CV2 (Open Computer Vision[OpenCV])
   - time
   - datetime
+  - Roboflow
+    - Bird Detection (https://universe.roboflow.com/guy-qibej/bird-detection-dyr4c)
+    - Inference (https://inference.roboflow.com/)
 - Raspberry Pi
 - Docker
 - Web Camera
