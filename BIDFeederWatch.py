@@ -80,7 +80,12 @@ def cameraStandby(cap: cv2.VideoCapture):
                 # Define the codec and create a VideoWriter object to save the video named as date and time.
                 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
                 name = videoName() + '.mp4'
-                out = cv2.VideoWriter(name, fourcc, FPS, (FRAME_WIDTH, FRAME_HEIGHT))
+                out = cv2.VideoWriter(
+                    name, 
+                    fourcc, 
+                    FPS, 
+                    (FRAME_WIDTH, FRAME_HEIGHT),
+                )
                 startRecordingTime = time.time()
                 recording = True                
                 # Write the first frame of recording.
@@ -152,7 +157,12 @@ def isMotionDetected(frame):
     frameDelta = cv2.absdiff(firstFrame, gray)
     
     # Apply a threshold to the difference to create a binary image
-    thresh = cv2.threshold(frameDelta, 25, 255, cv2.THRESH_BINARY)[1]
+    thresh = cv2.threshold(
+        frameDelta, 
+        25, 
+        255, 
+        cv2.THRESH_BINARY,
+    )[1]
 
     # Dilate the threshold image to fill in holes
     thresh = cv2.dilate(thresh, None, iterations=2)
@@ -171,7 +181,13 @@ def isMotionDetected(frame):
 
         # Get the bounding box for the contour and draw it on the frame
         (x, y, w, h) = cv2.boundingRect(contour)
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.rectangle(
+            frame, 
+            (x, y), 
+            (x + w, y + h), 
+            (0, 255, 0), 
+            2
+        )
         motionDetected = True        
         
     return frame, motionDetected
