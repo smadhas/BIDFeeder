@@ -1,0 +1,8 @@
+# Ignore environment files.
+.env
+.venv
+
+
+# Ignore all files in 
+Bird-detection-14141
+Bird-detection-14141/
