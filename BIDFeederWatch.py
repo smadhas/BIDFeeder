@@ -19,6 +19,7 @@ import cv2
 import time
 import datetime
 
+# Constants
 CAMERA_INDEX = 0  # use 1, if using external webcam on laptop with built-in camera
 MAX_RECORDINGS = 3
 RECORDING_TIME = 5  # in seconds 
