@@ -15,6 +15,7 @@
 __author__      = "Sundeep Madhas"
 __version__     = "0.1.0"
 
+import os
 import cv2
 import time
 import datetime
@@ -67,6 +68,11 @@ def cameraStandby(cap: cv2.VideoCapture):
     out = cv2.VideoWriter()
     recordingsMade = 0
     
+    # Set up video file path    
+    videoPath = "./videos/"
+    if not os.path.isdir(videoPath):
+        os.mkdir(videoPath)
+    
     # Standby loop. 
     while(True):
         ret, frame = cap.read()
@@ -80,8 +86,9 @@ def cameraStandby(cap: cv2.VideoCapture):
                 # Define the codec and create a VideoWriter object to save the video named as date and time.
                 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
                 name = videoName() + '.mp4'
+                filepath = os.path.join(videoPath, name)
                 out = cv2.VideoWriter(
-                    name, 
+                    filepath, 
                     fourcc, 
                     FPS, 
                     (FRAME_WIDTH, FRAME_HEIGHT),
